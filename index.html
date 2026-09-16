@@ -86,6 +86,14 @@
   .pill-btn.done-toggle{border-color:var(--border); color:var(--muted);}
   .pill-btn.done-toggle.on{border-color:var(--green); color:var(--green);}
   .hidden{display:none !important;}
+  .jump-row{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin:0 0 10px;}
+  .jump-row input{
+    width:56px; padding:5px 6px; border:1.5px solid var(--border); border-radius:8px;
+    font-size:13px; text-align:center; color:var(--text); font-family:inherit;
+  }
+  .jump-row input:focus{outline:none; border-color:var(--primary);}
+  .jump-row input::-webkit-outer-spin-button, .jump-row input::-webkit-inner-spin-button{margin:0;}
+  .jump-row .pill-btn{padding:5px 14px; font-size:12px;}
   .progress-bar{height:5px; background:var(--border); border-radius:99px; overflow:hidden; margin-bottom:16px;}
   .progress-fill{height:100%; background:var(--primary); transition:width .25s ease;}
   .q-meta{display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--muted); margin-bottom:10px;}
@@ -108,6 +116,21 @@
   .opt.wrong .mark{border-color:var(--red); background:var(--red); color:#fff;}
   .opt.disabled{cursor:default;}
   .opt.dim{opacity:.55;}
+  .q-lawbadge{
+    display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700;
+    padding:2px 9px; border-radius:99px; margin-left:6px; white-space:nowrap;
+  }
+  .q-lawbadge.high{background:var(--red-tint); color:var(--red);}
+  .q-lawbadge.check{background:#fef7e0; color:#976900;}
+  .law-note{
+    border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.6; margin:0 0 14px;
+  }
+  .law-note.high{background:var(--red-tint); color:#a50e0e; border:1px solid #f6b3ae;}
+  .law-note.check{background:#fef7e0; color:#7c5800; border:1px solid #feefc3;}
+  .law-note a{color:inherit; font-weight:700;}
+  .review-item .law-note{margin:8px 0 0; font-size:12px;}
+  .lawlist-item{border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:8px; font-size:13px;}
+  .lawlist-item .q{font-weight:500; margin-bottom:4px;}
   .actions{display:flex; gap:10px; margin-top:18px;}
   .btn{
     flex:1; padding:12px 16px; border-radius:999px; border:none; font-size:14.5px; font-weight:500;
@@ -148,7 +171,7 @@
   </header>
 
   <div class="warn">
-    ⚠️ <strong>提醒：</strong>本題庫轉錄自舊版參考試題（原始 PDF 建立於 2015 年），部分法規（如《職業安全衛生法》《職業安全衛生設施規則》等）近年已修正，題目所附答案<strong>不保證為最新法規內容</strong>。遇到有把握卻與題庫答案不同的題目，請以
+    ⚠️ <strong>提醒：</strong>本題庫轉錄自舊版參考試題（原始 PDF 建立於 2015 年）。《職業安全衛生法》已於 <strong>114 年 12 月 2 日三讀、12 月 19 日總統公布</strong>大幅修正（共 25 條修正、新增 6 條），重點包含：<strong>新增「職場霸凌防治專章」（已自 115 年 7 月 1 日施行）</strong>、多項罰鍰上限調高（例如未實施安全衛生教育訓練，罰鍰上限已由 15 萬元提高至 75 萬元）、違規資訊公開、承攬管理與工程業主責任擴大；其餘條文施行日期由行政院另定，尚未全部生效。《職業安全衛生管理辦法》也已於 <strong>115 年 6 月 29 日</strong>修正。題庫中<strong>題號 #291、#547 已確認為舊罰鍰金額</strong>，另有數題罰則相關題目建議另行查證（作答時會顯示提示）。「職場霸凌」是全新規範，本題庫（2015年版）完全沒有涵蓋，應考前務必另外補強。答案<strong>不保證為最新法規內容</strong>，請以
     <a href="https://law.moj.gov.tw/" target="_blank" rel="noopener">全國法規資料庫</a>
     最新公告條文為準，本測驗僅供練習與複習使用。
   </div>
@@ -165,6 +188,13 @@
       <div class="section-title">🗓️ 考前 5 天衝刺計畫</div>
       <div style="font-size:12.5px; color:var(--muted); margin-bottom:12px;">依題號分成 4 天讀完全部 <span id="planTotalCount">0</span> 題，第 5 天全力複習錯題＋模擬測驗。點「開始」直接進入該天範圍的題目。</div>
       <div id="planContainer"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">⚠️ 可能受 2025–2026 修法影響的題目</div>
+      <div style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">已人工比對本次《職業安全衛生法》修法內容，標註出題庫中<strong id="lawFlagCount">0</strong> 題罰則相關題目：其中確認為舊罰鍰金額、及建議另行查證最新金額或條文的題目都列在下面。點題目可展開詳情，或直接開始針對性練習。</div>
+      <div id="lawFlagList"></div>
+      <button class="pill-btn solid" id="btnPracticeLawFlags" style="margin-top:6px;">逐題練習這些題目</button>
     </div>
 
     <div class="card">
@@ -209,16 +239,24 @@
       <button class="link-btn" id="btnQuitQuiz">‹ 結束並返回首頁</button>
       <div style="font-size:13px; color:var(--muted);">答對 <strong id="quizScore">0</strong> / <span id="quizAnswered">0</span></div>
     </div>
+    <div class="jump-row">
+      <span>跳至第</span>
+      <input type="number" id="jumpInput" min="1" inputmode="numeric" placeholder="1">
+      <span>／<span id="jumpMax">1</span> 題</span>
+      <button class="pill-btn" id="btnJump">前往</button>
+    </div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
     <div class="card">
       <div class="q-meta">
-        <span class="q-badge">第 <span id="qIndex">1</span> / <span id="qTotal">1</span> 題</span>
+        <span><span class="q-badge">第 <span id="qIndex">1</span> / <span id="qTotal">1</span> 題</span><span id="qLawBadge" class="q-lawbadge hidden"></span></span>
         <span id="qOrigNum" style="color:var(--muted);"></span>
       </div>
       <div class="q-text" id="qText"></div>
+      <div id="lawNote" class="law-note hidden"></div>
       <div id="optsContainer"></div>
       <div class="actions">
-        <button class="btn secondary hidden" id="btnSkip">跳過</button>
+        <button class="btn ghost" id="btnPrev" disabled>‹ 上一題</button>
+        <button class="btn secondary" id="btnSkip">跳過</button>
         <button class="btn" id="btnNext" disabled>下一題</button>
       </div>
     </div>
@@ -265,6 +303,19 @@ const QUESTIONS = [{"id": 1, "question": "依職業安全衛生管理辦法規�
 const STORAGE_KEY = "oshQuizWrongV1";
 const STATS_KEY = "oshQuizStatsV1";
 const PLAN_KEY = "oshQuizPlanV1";
+
+// 2025-2026 職業安全衛生法規修法對照：人工比對題庫內容後標註，
+// high = 已確認題庫答案為修法前舊金額／舊規定；check = 屬本次修法涉及範圍，建議自行查證最新條文。
+const LAW_FLAGS = {
+  291: {level:'high', note:'依 114.12.19 修正之《職業安全衛生法》，未實施必要安全衛生教育訓練經通知限期未改善之罰鍰上限，已由 15 萬元提高至 75 萬元。本題選項仍為修法前金額，僅供練習作答邏輯，正確金額請查最新條文。'},
+  547: {level:'high', note:'同 #291，罰鍰上限已由 15 萬元提高至 75 萬元（114.12.19 修正），本題選項為舊金額。'},
+  550: {level:'check', note:'本題屬職業安全衛生法罰則／通報相關條文，該法已於 114.12.19 大幅修正並調高多項罰鍰與刑責額度，建議自行查證最新條文金額是否已調整。'},
+  598: {level:'check', note:'涉及罰則金額，職業安全衛生法已於 114.12.19 修正，建議查證此金額是否已調整。'},
+  845: {level:'check', note:'涉及罰則金額，職業安全衛生法已於 114.12.19 修正，建議查證此金額是否已調整。'},
+  1007:{level:'check', note:'涉及罰則金額，職業安全衛生法已於 114.12.19 修正，建議查證此金額是否已調整。'},
+  769: {level:'check', note:'涉及刑責年限，依目前查得之最新條文仍為 3 年以下有期徒刑，但建議自行核對最新條文以確認未再修正。'}
+};
+const LAW_FLAG_IDS = Object.keys(LAW_FLAGS).map(x=>parseInt(x,10));
 
 const PLAN_SPLIT = 4; // 前 4 天平均分完全部題庫，第 5 天複習
 function buildStudyPlan(){
@@ -325,6 +376,7 @@ let state = {
   score: 0,
   answered: 0,
   wrongThisSession: [],  // {q, chosen}
+  answers: [],        // per-question record: null (unanswered/skipped) | {chosen}
   currentAnswered: false
 };
 
@@ -353,7 +405,29 @@ function refreshHome(){
     ? "目前沒有錯題，太棒了！"
     : `複習答錯過、尚未答對的題目（共 ${wrongCount} 題）`;
   renderStudyPlan();
+  renderLawFlagList();
 }
+
+function renderLawFlagList(){
+  document.getElementById('lawFlagCount').textContent = LAW_FLAG_IDS.length;
+  const container = document.getElementById('lawFlagList');
+  container.innerHTML = '';
+  LAW_FLAG_IDS.slice().sort((a,b)=>a-b).forEach(id=>{
+    const q = qById(id);
+    if(!q) return;
+    const flag = LAW_FLAGS[id];
+    const div = document.createElement('div');
+    div.className = 'lawlist-item';
+    div.innerHTML = `<div class="q">#${id}　<span class="q-lawbadge ${flag.level}" style="margin-left:0;">${flag.level==='high'?'⚠️ 已修法':'🔍 請查證'}</span>　${escapeHtml(q.question)}</div>`;
+    container.appendChild(div);
+  });
+}
+
+document.getElementById('btnPracticeLawFlags').addEventListener('click', ()=>{
+  const pool = LAW_FLAG_IDS.slice().sort((a,b)=>a-b).map(qById).filter(Boolean);
+  if(pool.length===0) return;
+  startQuiz('lawcheck', pool);
+});
 
 function questionsInRange(range){
   return QUESTIONS.filter(q => q.id>=range[0] && q.id<=range[1]);
@@ -468,6 +542,8 @@ document.getElementById('btnBackHome').addEventListener('click', ()=>{ refreshHo
 document.getElementById('btnRetry').addEventListener('click', ()=>{
   if(state.mode==='plan' && state.planDay){
     startPlanDay(state.planDay);
+  } else if(state.mode==='lawcheck'){
+    document.getElementById('btnPracticeLawFlags').click();
   } else if(state.mode==='review'){
     document.getElementById('btnReview').click();
   } else if(state.mode==='sequential'){
@@ -476,38 +552,93 @@ document.getElementById('btnRetry').addEventListener('click', ()=>{
     document.getElementById('btnRandom').click();
   }
 });
-document.getElementById('btnSkip').addEventListener('click', ()=> nextQuestion());
+document.getElementById('btnSkip').addEventListener('click', ()=> skipQuestion());
 document.getElementById('btnNext').addEventListener('click', ()=> nextQuestion());
+document.getElementById('btnPrev').addEventListener('click', ()=> prevQuestion());
+document.getElementById('btnJump').addEventListener('click', ()=>{
+  const jumpInput = document.getElementById('jumpInput');
+  jumpToQuestion(parseInt(jumpInput.value, 10));
+  jumpInput.value = '';
+});
+document.getElementById('jumpInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    document.getElementById('btnJump').click();
+  }
+});
 
 function startQuiz(mode, queue){
-  state = { mode, queue, idx:0, score:0, answered:0, wrongThisSession:[], currentAnswered:false };
+  state = {
+    mode, queue, idx:0, score:0, answered:0,
+    wrongThisSession:[],
+    answers: new Array(queue.length).fill(null),
+    currentAnswered:false
+  };
   showScreen('screen-quiz');
   document.getElementById('qTotal').textContent = queue.length;
-  document.getElementById('btnSkip').classList.add('hidden');
+  document.getElementById('jumpMax').textContent = queue.length;
+  const jumpInput = document.getElementById('jumpInput');
+  jumpInput.max = queue.length;
+  jumpInput.value = '';
+  renderQuestion();
+}
+
+function jumpToQuestion(n){
+  if(!state.queue.length || isNaN(n)) return;
+  const clamped = Math.min(Math.max(1, n), state.queue.length);
+  state.idx = clamped - 1;
   renderQuestion();
 }
 
 function renderQuestion(){
   const q = state.queue[state.idx];
+  const recorded = state.answers[state.idx]; // null (unanswered) | {chosen}
+
   document.getElementById('qIndex').textContent = state.idx+1;
+  document.getElementById('jumpInput').placeholder = state.idx+1;
   document.getElementById('qOrigNum').textContent = '題號 #' + q.id;
   document.getElementById('qText').textContent = q.question;
+
+  const flag = LAW_FLAGS[q.id];
+  const badgeEl = document.getElementById('qLawBadge');
+  const noteEl = document.getElementById('lawNote');
+  if(flag){
+    badgeEl.textContent = flag.level==='high' ? '⚠️ 已修法' : '🔍 請查證';
+    badgeEl.className = 'q-lawbadge ' + flag.level;
+    badgeEl.classList.remove('hidden');
+    noteEl.textContent = (flag.level==='high' ? '⚠️ 已確認修法異動：' : '🔍 建議查證：') + flag.note;
+    noteEl.className = 'law-note ' + flag.level;
+  } else {
+    badgeEl.classList.add('hidden');
+    noteEl.classList.add('hidden');
+  }
   document.getElementById('quizScore').textContent = state.score;
   document.getElementById('quizAnswered').textContent = state.answered;
   document.getElementById('progressFill').style.width = ((state.idx)/state.queue.length*100)+'%';
 
   const container = document.getElementById('optsContainer');
   container.innerHTML = '';
+  const chosenIdx = recorded ? recorded.chosen : null;
   q.options.forEach((optText, i)=>{
     const div = document.createElement('div');
     div.className = 'opt';
     div.innerHTML = `<span class="mark">${CIRCLE[i]}</span><span>${escapeHtml(optText)}</span>`;
-    div.addEventListener('click', ()=> selectAnswer(i));
+    if(recorded === null){
+      div.addEventListener('click', ()=> selectAnswer(i));
+    } else {
+      div.classList.add('disabled');
+      if(i===q.answer) div.classList.add('correct');
+      else if(i===chosenIdx) div.classList.add('wrong');
+      else div.classList.add('dim');
+    }
     container.appendChild(div);
   });
-  document.getElementById('btnNext').disabled = true;
+
+  document.getElementById('btnPrev').disabled = (state.idx === 0);
+  document.getElementById('btnSkip').classList.toggle('hidden', recorded !== null);
+  document.getElementById('btnNext').disabled = (recorded === null);
   document.getElementById('btnNext').textContent = (state.idx === state.queue.length-1) ? '完成測驗' : '下一題';
-  state.currentAnswered = false;
+  state.currentAnswered = (recorded !== null);
 }
 
 function escapeHtml(s){
@@ -515,19 +646,13 @@ function escapeHtml(s){
 }
 
 function selectAnswer(i){
-  if(state.currentAnswered) return;
-  state.currentAnswered = true;
-  const q = state.queue[state.idx];
-  const opts = document.querySelectorAll('#optsContainer .opt');
+  const idx = state.idx;
+  if(state.answers[idx] !== null) return;
+  const q = state.queue[idx];
   const correct = q.answer;
-  opts.forEach((el, idx)=>{
-    el.classList.add('disabled');
-    if(idx===correct) el.classList.add('correct');
-    if(idx===i && i!==correct) el.classList.add('wrong');
-    if(idx!==correct && idx!==i) el.classList.add('dim');
-  });
-
   const isCorrect = (i===correct);
+
+  state.answers[idx] = {chosen:i};
   state.answered++;
   if(isCorrect) state.score++;
   else state.wrongThisSession.push({q, chosen:i});
@@ -548,12 +673,29 @@ function selectAnswer(i){
   }
   saveWrong(wrongMap);
 
-  document.getElementById('quizScore').textContent = state.score;
-  document.getElementById('quizAnswered').textContent = state.answered;
-  document.getElementById('btnNext').disabled = false;
+  renderQuestion();
+}
+
+function skipQuestion(){
+  // 跳過＝暫時不作答就前進，題目仍保持未答狀態，之後用「上一題」回來還是可以直接作答
+  if(state.answers[state.idx] !== null) return;
+  if(state.idx < state.queue.length-1){
+    state.idx++;
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function prevQuestion(){
+  if(state.idx > 0){
+    state.idx--;
+    renderQuestion();
+  }
 }
 
 function nextQuestion(){
+  if(state.answers[state.idx] === null) return;
   if(state.idx < state.queue.length-1){
     state.idx++;
     renderQuestion();
@@ -566,7 +708,8 @@ function finishQuiz(){
   document.getElementById('resultScore').textContent = state.score;
   document.getElementById('resultTotal').textContent = state.queue.length;
   const pct = state.queue.length ? Math.round(state.score/state.queue.length*100) : 0;
-  document.getElementById('resultAccuracy').textContent = `正確率 ${pct}%`;
+  const skippedCount = state.answers.filter(a=>a===null).length;
+  document.getElementById('resultAccuracy').textContent = `正確率 ${pct}%` + (skippedCount>0 ? `　·　尚有 ${skippedCount} 題未作答／已跳過` : '');
 
   const wrongCard = document.getElementById('resultWrongCard');
   const list = document.getElementById('resultWrongList');
@@ -586,6 +729,12 @@ function finishQuiz(){
   showScreen('screen-result');
 }
 
+function lawNoteHtml(q){
+  const flag = LAW_FLAGS[q.id];
+  if(!flag) return '';
+  return `<div class="law-note ${flag.level}">${flag.level==='high'?'⚠️ 已確認修法異動：':'🔍 建議查證：'}${escapeHtml(flag.note)}</div>`;
+}
+
 function buildReviewItem(q, chosenIdx){
   const div = document.createElement('div');
   div.className = 'review-item';
@@ -595,7 +744,7 @@ function buildReviewItem(q, chosenIdx){
     else if(i===chosenIdx) cls='bad';
     return `<div class="${cls}">${CIRCLE[i]} ${escapeHtml(opt)}${i===q.answer?'（正確答案）':(i===chosenIdx?'（你的答案）':'')}</div>`;
   }).join('');
-  div.innerHTML = `<div class="q">#${q.id}　${escapeHtml(q.question)}</div><div class="opts">${optsHtml}</div>`;
+  div.innerHTML = `<div class="q">#${q.id}　${escapeHtml(q.question)}</div><div class="opts">${optsHtml}</div>${lawNoteHtml(q)}`;
   return div;
 }
 
@@ -620,7 +769,7 @@ function renderWrongList(){
         const cls = i===q.answer ? 'ok' : '';
         return `<div class="${cls}">${CIRCLE[i]} ${escapeHtml(opt)}${i===q.answer?'（正確答案）':''}</div>`;
       }).join('');
-      item.innerHTML = `<div class="q">#${q.id}　${escapeHtml(q.question)}</div><div class="opts">${optsHtml}</div>
+      item.innerHTML = `<div class="q">#${q.id}　${escapeHtml(q.question)}</div><div class="opts">${optsHtml}</div>${lawNoteHtml(q)}
         <div class="meta">
           <span class="miss-count">已答錯 ${wrongMap[id].missCount} 次</span>
           <button class="small-btn" data-id="${id}">移除此題</button>
